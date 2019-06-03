@@ -12,9 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WranglerRequest {
-
     private List<QuestionInputData> responses;
-
-
 
 }

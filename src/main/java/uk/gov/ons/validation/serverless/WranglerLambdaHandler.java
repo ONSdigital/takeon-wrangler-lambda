@@ -15,21 +15,16 @@ public class WranglerLambdaHandler implements RequestHandler<WranglerRequest, St
     public String handleRequest(WranglerRequest request, Context context) {
 
         try {
-
             newProcessQuestionData().processQuestionAndDerivedData(request);
-
         } catch (Exception e) {
             log.error("An exception was raised handling the Wrangler Lambda request.", e);
             return "Failed";
         }
-
-
-        return "Accepted" ;
+        return "Accepted";
     }
 
-    private ProcessWranglerQuestionData newProcessQuestionData(){
+    private ProcessWranglerQuestionData newProcessQuestionData() {
         return new ProcessWranglerQuestionData();
-
     }
 
 
