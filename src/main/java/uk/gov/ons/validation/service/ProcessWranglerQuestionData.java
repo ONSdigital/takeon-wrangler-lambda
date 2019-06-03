@@ -15,7 +15,6 @@ import uk.gov.ons.validation.entity.WranglerRequest;
 import uk.gov.ons.validation.entity.WranglerResponseData;
 import uk.gov.ons.validation.util.PropertiesUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -24,123 +23,91 @@ import static java.lang.String.format;
 public class ProcessWranglerQuestionData {
 
     private static final String SEND_MESSAGE = "Attempting to invoke %s with the json string %s.";
-    private static final String QUES_DER_CODE_MESSAGE = "Match Question Code %s and Derived Question code is %s.";
-    private static final String QUES_DER_VALUE_MESSAGE = "Match Question Code value %s and Derived Question code value is %s.";
-    private static final String MATCH_FOUND_QUEST = "Matching object found for Question and its code is %s.";
-    private static final String MATCH_FOUND_DERIVED_QUEST = "Matching object found for Derived Question and its code is %s.";
+    private static final String QUES_DER_MESSAGE = "Match Found for both Question and Derived Question. " +
+            "Question Code is %s Derived Question code is %s Question Code value %s " +
+            "and Derived Question code value is %s.";
 
-
+    /**
+     * Process Question data containing Question code and their values from Data Preparation Lambda
+     * @param request WranglerRequest
+     * @throws Exception
+     */
     public void processQuestionAndDerivedData(WranglerRequest request) throws Exception {
 
-        log.info("Parsing Json Array to Java object: ");
-
-        //1. Building Validation Config this is separate feature. So hard coding it
-        List<ValidationConfig> configuration = new ArrayList<>();
-        ValidationConfig config1 = new ValidationConfig();
-        config1.setQuestionCode("601");
-        config1.setDerivedQuestionCode("700");
-        configuration.add(config1);
-        ValidationConfig config2 = new ValidationConfig();
-        config2.setQuestionCode("602");
-        config2.setDerivedQuestionCode("701");
-        configuration.add(config2);
+        //1. Building Validation Config
+        ValidationConfig validationData = new ValidationConfig();
+        List<ValidationConfig> configuration = validationData.getValidationConfiguration();
 
         List<QuestionInputData> responses = request.getResponses();
-
-        log.info("Request Data {} " , responses);
-
-
-        String finalQuestCode = null;
-        String finalDerivedQuestCode = null;
-        String finalQuestCodeValue = null;
-        String finalDerivedQuestValue = null;
-
-
+        log.info("Request Data {} ", responses);
 
         if (configuration != null && configuration.size() > 0) {
             for (ValidationConfig config : configuration) {
-
-                boolean isQuestionCodeFound = false;
-                boolean isDerivedQuestFound = false;
+                InvokeConfig invokeConfig = newInvokeConfig();
                 for (QuestionInputData inputData : responses) {
-
-
-                    if (inputData.getQuestionCode().equals(config.getQuestionCode())) {
-
-
-
-                        isQuestionCodeFound = true;
-                        finalQuestCode = inputData.getQuestionCode();
-                        finalQuestCodeValue = inputData.getResponse();
-                        log.info(format(MATCH_FOUND_QUEST, finalQuestCode));
-                    }
-                    if (inputData.getQuestionCode().equals(config.getDerivedQuestionCode())) {
-                        isDerivedQuestFound = true;
-                        finalDerivedQuestCode = inputData.getQuestionCode();
-                        finalDerivedQuestValue = inputData.getResponse();
-                        log.info(format(MATCH_FOUND_DERIVED_QUEST, finalDerivedQuestCode));
-
-                    }
-                    if (isQuestionCodeFound && isDerivedQuestFound) {
+                    invokeConfig.processQuestionCodeFound(inputData, config.getQuestionCode());
+                    invokeConfig.processDerivedQuestFound(inputData, config.getDerivedQuestionCode());
+                    if (invokeConfig.isQuestionCodeFound() && invokeConfig.isDerivedQuestFound()) {
+                        log.info(format(QUES_DER_MESSAGE, invokeConfig.getFinalQuestCode(),
+                                invokeConfig.getFinalDerivedQuestCode(), invokeConfig.getFinalQuestCodeValue(),
+                                invokeConfig.getFinalDerivedQuestValue()));
+                        //Call External Lambda which performs Validation
+                        callValidationLambda(invokeConfig);
                         break;
                     }
                 }
-                if (isQuestionCodeFound && isDerivedQuestFound) {
-                    log.info("Match Found for both Question and Derived Question");
-
-
-                    log.info(format(QUES_DER_CODE_MESSAGE, finalQuestCode, finalDerivedQuestCode));
-                    log.info(format(QUES_DER_VALUE_MESSAGE, finalQuestCodeValue, finalDerivedQuestValue));
-                    //Call External Lambda which performs Validation
-                    log.info("Before Calling Validation Lambda");
-                    WranglerResponseData dataElement = WranglerResponseData.builder()
-                            .primaryValue(finalQuestCodeValue)
-                            .comparisonValue(finalDerivedQuestValue)
-                            .build();
-                    sendDataToWrangler(dataElement);
-
-                    log.info("After Calling Validation Lambda");
-                    finalQuestCode = null;
-                    finalDerivedQuestCode = null;
-                    finalQuestCodeValue = null;
-                    finalDerivedQuestValue = null;
-
-                }
-
             }
-
         }
-
     }
 
-    private void sendDataToWrangler(WranglerResponseData data) throws JsonProcessingException {
+    /**
+     * Call Validation Lambda i.e. VET
+     * @param config InvokeConfig
+     * @throws JsonProcessingException
+     */
+    private void callValidationLambda(InvokeConfig config) throws JsonProcessingException {
         try {
-
-
-            String requestJson = new ObjectMapper().writeValueAsString(data);
+            //Call External Lambda which performs Validation
+            log.info("Before Calling Validation Lambda");
+            WranglerResponseData dataElement = WranglerResponseData.builder()
+                    .primaryValue(config.getFinalQuestCodeValue())
+                    .comparisonValue(config.getFinalDerivedQuestValue())
+                    .build();
+            String requestJson = new ObjectMapper().writeValueAsString(dataElement);
             String wranglerName = PropertiesUtil.getProperty(Constants.WRANGLER_NAME);
-
             log.info(format(SEND_MESSAGE, wranglerName, requestJson));
-
             InvokeRequest invokeRequest = newInvokeRequest();
             invokeRequest.withFunctionName(wranglerName).withPayload(requestJson);
-
             InvokeResult result = buildAWSLambdaClient().invoke(invokeRequest);
             log.info(format("Status after calling Validation Lambda %s", result.getStatusCode()));
-
-
-
         } catch (JsonProcessingException e) {
-            log.error("An exception occurred while attempting to prepare and send the request to Validation lambda.", e);
+            log.error("An exception occurred while attempting to prepare " +
+                    "and send the request to Validation lambda.", e);
             throw e;
         }
     }
 
+    /**
+     * Build AWS Lambda Client
+     * @return AWSLambdaAsync
+     */
     private AWSLambdaAsync buildAWSLambdaClient() {
         return AWSLambdaAsyncClient.asyncBuilder().withRegion(Regions.EU_WEST_2).build();
     }
 
+    /**
+     *  Create new InvokeRequest for Lambda
+     * @return InvokeRequest
+     */
     private InvokeRequest newInvokeRequest() {
         return new InvokeRequest();
+    }
+
+    /**
+     * Create new Invoke Config to process Question and Derived data
+     * @return InvokeConfig
+     */
+    private InvokeConfig newInvokeConfig() {
+        return new InvokeConfig();
     }
 }

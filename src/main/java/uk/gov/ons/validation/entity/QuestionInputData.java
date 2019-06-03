@@ -12,9 +12,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuestionInputData {
-
     private String questionCode;
     private String response;
-
-
 }

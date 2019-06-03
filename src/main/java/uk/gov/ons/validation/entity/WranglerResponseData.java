@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -15,6 +13,5 @@ public class WranglerResponseData {
     public String primaryValue ;
     public String comparisonValue ;
     public Object metaData;
-
 
 }
