@@ -29,6 +29,7 @@ public class ProcessWranglerQuestionData {
 
     /**
      * Process Question data containing Question code and their values from Data Preparation Lambda
+     *
      * @param request WranglerRequest
      * @throws Exception
      */
@@ -62,6 +63,7 @@ public class ProcessWranglerQuestionData {
 
     /**
      * Call Validation Lambda i.e. VET
+     *
      * @param config InvokeConfig
      * @throws JsonProcessingException
      */
@@ -89,6 +91,7 @@ public class ProcessWranglerQuestionData {
 
     /**
      * Build AWS Lambda Client
+     *
      * @return AWSLambdaAsync
      */
     private AWSLambdaAsync buildAWSLambdaClient() {
@@ -96,7 +99,8 @@ public class ProcessWranglerQuestionData {
     }
 
     /**
-     *  Create new InvokeRequest for Lambda
+     * Create new InvokeRequest for Lambda
+     *
      * @return InvokeRequest
      */
     private InvokeRequest newInvokeRequest() {
@@ -105,6 +109,7 @@ public class ProcessWranglerQuestionData {
 
     /**
      * Create new Invoke Config to process Question and Derived data
+     *
      * @return InvokeConfig
      */
     private InvokeConfig newInvokeConfig() {

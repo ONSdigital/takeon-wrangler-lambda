@@ -20,10 +20,10 @@ public class WranglerLambdaHandler implements RequestHandler<WranglerRequest, St
             log.error("An exception was raised handling the Wrangler Lambda request.", e);
             return "Failed";
         }
-        return "Accepted" ;
+        return "Accepted";
     }
 
-    private ProcessWranglerQuestionData newProcessQuestionData(){
+    private ProcessWranglerQuestionData newProcessQuestionData() {
         return new ProcessWranglerQuestionData();
     }
 

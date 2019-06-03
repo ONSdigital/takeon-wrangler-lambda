@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WranglerResponseData {
-    public String primaryValue ;
-    public String comparisonValue ;
+    public String primaryValue;
+    public String comparisonValue;
     public Object metaData;
 
 }

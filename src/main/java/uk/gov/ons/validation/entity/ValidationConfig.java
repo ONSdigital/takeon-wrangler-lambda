@@ -17,7 +17,7 @@ public class ValidationConfig {
     public String questionCode;
     public String derivedQuestionCode;
 
-    public List<ValidationConfig> getValidationConfiguration(){
+    public List<ValidationConfig> getValidationConfiguration() {
         List<ValidationConfig> configuration = new ArrayList<>();
         ValidationConfig config1 = new ValidationConfig();
         config1.setQuestionCode("601");

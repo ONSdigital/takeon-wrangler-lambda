@@ -11,6 +11,7 @@ import java.util.Map;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.powermock.reflect.Whitebox.setInternalState;
+
 import uk.gov.ons.validation.exception.NoPropertyFoundException;
 
 public class PropertiesUtilTest {

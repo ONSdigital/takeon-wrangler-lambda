@@ -1,4 +1,5 @@
 package uk.gov.ons.validation.serverless;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,14 +27,12 @@ import uk.gov.ons.validation.entity.WranglerRequest;
 @PowerMockIgnore("javax.management.*")
 public class WranglerLambdaHandlerTest {
 
-
     private WranglerLambdaHandler handler = spy(new WranglerLambdaHandler());
+
     @Mock
     private Context context;
-
     @Mock
     private ProcessWranglerQuestionData processData;
-
 
     @Before
     public void init() throws Exception {
@@ -43,7 +42,6 @@ public class WranglerLambdaHandlerTest {
         when(PropertiesUtil.getProperty("WRANGLER_NAME")).thenReturn("wrangler-lambda");
     }
 
-
     @Test
     public void testAcceptedResponse() throws Exception {
         doReturn(processData).when(handler, "newProcessQuestionData");
@@ -51,8 +49,6 @@ public class WranglerLambdaHandlerTest {
         assertThat(result, equalTo("Accepted"));
 
     }
-
-
 
     @Test
     public void testFailedResponse() throws Exception {

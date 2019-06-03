@@ -27,7 +27,6 @@ public class InvokeConfig {
     private static final String MATCH_FOUND_DERIVED_QUEST = "Matching object found for Derived Question and its code is %s.";
 
     /**
-     *
      * @param inputData
      * @param configQuestionCode
      */
@@ -42,7 +41,6 @@ public class InvokeConfig {
     }
 
     /**
-     *
      * @param inputData
      * @param configDerivedQuestCode
      */
