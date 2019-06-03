@@ -5,9 +5,12 @@ import com.amazonaws.services.lambda.AWSLambdaAsync;
 import com.amazonaws.services.lambda.AWSLambdaAsyncClient;
 import com.amazonaws.services.lambda.model.InvokeRequest;
 import com.amazonaws.services.lambda.model.InvokeResult;
+import com.amazonaws.services.sns.AmazonSNSClientBuilder;
+import com.amazonaws.services.sns.model.PublishRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.ons.validation.common.Constants;
+import uk.gov.ons.validation.entity.MessageResponse;
 import uk.gov.ons.validation.entity.QuestionInputData;
 import uk.gov.ons.validation.entity.ValidationConfig;
 import lombok.extern.log4j.Log4j2;
@@ -110,7 +113,8 @@ public class ProcessWranglerQuestionData {
             }
 
         }
-
+        // BPM (Business Process Management) response goes here. This method puts 
+        sendBpmResponse("B123-P456-M789", "QvsDQ", "arn:aws:sns:eu-west-2:014669633018:Take-On-Validation-SNS");
     }
 
     private void sendDataToWrangler(WranglerResponseData data) throws JsonProcessingException {
@@ -142,5 +146,30 @@ public class ProcessWranglerQuestionData {
 
     private InvokeRequest newInvokeRequest() {
         return new InvokeRequest();
+    }
+
+    private String constructBpmResponse(String bpmInstance, String validationName) throws JsonProcessingException{
+        MessageResponse message = MessageResponse.builder().bpmInstance(bpmInstance).validationName(validationName).build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(message);
+    }
+
+    private void sendBpmResponse(String bpmInstance, String validationName, String topicArn) throws JsonProcessingException{
+        String messageToSend;
+        try{
+            messageToSend = constructBpmResponse(bpmInstance, validationName);
+        }
+        catch(JsonProcessingException e){
+            log.error("An exception occured while attempting to process Bpm Response message", e);
+            throw e;
+        }
+
+        try{
+            PublishRequest publishRequest = new PublishRequest(topicArn, messageToSend);
+            AmazonSNSClientBuilder.defaultClient().publish(publishRequest);
+        }
+        catch(Exception  e){
+            log.error("An exception occured during a publish request", e);
+        }
     }
 }
