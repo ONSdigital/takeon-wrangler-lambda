@@ -24,12 +24,17 @@ import static java.lang.String.format;
 public class ProcessWranglerQuestionData {
 
     private static final String SEND_MESSAGE = "Attempting to invoke %s with the json string %s.";
+    private static final String QUES_DER_CODE_MESSAGE = "Match Question Code %s and Derived Question code is %s.";
+    private static final String QUES_DER_VALUE_MESSAGE = "Match Question Code value %s and Derived Question code value is %s.";
+    private static final String MATCH_FOUND_QUEST = "Matching object found for Question and its code is %s.";
+    private static final String MATCH_FOUND_DERIVED_QUEST = "Matching object found for Derived Question and its code is %s.";
+
 
     public void processQuestionAndDerivedData(WranglerRequest request) throws Exception {
 
         log.info("Parsing Json Array to Java object: ");
 
-        //1. Building Validation Config
+        //1. Building Validation Config this is separate feature. So hard coding it
         List<ValidationConfig> configuration = new ArrayList<>();
         ValidationConfig config1 = new ValidationConfig();
         config1.setQuestionCode("601");
@@ -42,15 +47,8 @@ public class ProcessWranglerQuestionData {
 
         List<QuestionInputData> responses = request.getResponses();
 
-        System.out.println("Request Data" + responses);
+        log.info("Request Data {} " , responses);
 
-        if (responses != null) {
-            for (QuestionInputData response : responses) {
-                System.out.println("response" + response);
-
-            }
-
-        }
 
         String finalQuestCode = null;
         String finalDerivedQuestCode = null;
@@ -68,35 +66,40 @@ public class ProcessWranglerQuestionData {
 
 
                     if (inputData.getQuestionCode().equals(config.getQuestionCode())) {
-                        System.out.println("Matching object found for Question" + inputData.getQuestionCode());
+
+
 
                         isQuestionCodeFound = true;
                         finalQuestCode = inputData.getQuestionCode();
                         finalQuestCodeValue = inputData.getResponse();
+                        log.info(format(MATCH_FOUND_QUEST, finalQuestCode));
                     }
                     if (inputData.getQuestionCode().equals(config.getDerivedQuestionCode())) {
                         isDerivedQuestFound = true;
                         finalDerivedQuestCode = inputData.getQuestionCode();
                         finalDerivedQuestValue = inputData.getResponse();
-                        System.out.println("Matching object found for Derived Question" + config.getDerivedQuestionCode());
+                        log.info(format(MATCH_FOUND_DERIVED_QUEST, finalDerivedQuestCode));
+
                     }
                     if (isQuestionCodeFound && isDerivedQuestFound) {
                         break;
                     }
                 }
                 if (isQuestionCodeFound && isDerivedQuestFound) {
-                    System.out.println("Match Found for both Question and Derived Question");
-                    System.out.println("Question Code " + finalQuestCode + "Derived Question Code" + finalDerivedQuestCode);
-                    System.out.println("Question Code Value " + finalQuestCodeValue + "Derived Question Code Value" + finalDerivedQuestValue);
-                    //Call Larissa Lambda which performs Validation
-                    System.out.println("Before Calling Validation Lambda");
+                    log.info("Match Found for both Question and Derived Question");
+
+
+                    log.info(format(QUES_DER_CODE_MESSAGE, finalQuestCode, finalDerivedQuestCode));
+                    log.info(format(QUES_DER_VALUE_MESSAGE, finalQuestCodeValue, finalDerivedQuestValue));
+                    //Call External Lambda which performs Validation
+                    log.info("Before Calling Validation Lambda");
                     WranglerResponseData dataElement = WranglerResponseData.builder()
                             .primaryValue(finalQuestCodeValue)
                             .comparisonValue(finalDerivedQuestValue)
                             .build();
                     sendDataToWrangler(dataElement);
 
-                    System.out.println("After Calling Validation Lambda");
+                    log.info("After Calling Validation Lambda");
                     finalQuestCode = null;
                     finalDerivedQuestCode = null;
                     finalQuestCodeValue = null;
@@ -112,27 +115,23 @@ public class ProcessWranglerQuestionData {
 
     private void sendDataToWrangler(WranglerResponseData data) throws JsonProcessingException {
         try {
-            AWSLambdaAsync client = AWSLambdaAsyncClient.asyncBuilder().withRegion(Regions.EU_WEST_2).build();
-
 
 
             String requestJson = new ObjectMapper().writeValueAsString(data);
             String wranglerName = PropertiesUtil.getProperty(Constants.WRANGLER_NAME);
 
             log.info(format(SEND_MESSAGE, wranglerName, requestJson));
-            System.out.println("jSon Request" + requestJson);
-            System.out.println("Data sending to Lambda"+data);
-
 
             InvokeRequest invokeRequest = newInvokeRequest();
             invokeRequest.withFunctionName(wranglerName).withPayload(requestJson);
 
             InvokeResult result = buildAWSLambdaClient().invoke(invokeRequest);
-            log.info("Status after calling Validation Lambda", result.getStatusCode());
+            log.info(format("Status after calling Validation Lambda %s", result.getStatusCode()));
+
 
 
         } catch (JsonProcessingException e) {
-            log.error("An exception occurred while attempting to prepare and send the request to validation lambda.", e);
+            log.error("An exception occurred while attempting to prepare and send the request to Validation lambda.", e);
             throw e;
         }
     }
