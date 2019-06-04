@@ -12,6 +12,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WranglerRequest {
+
+    private String period;
+    private String reference;
+    private String survey;
+    private String instance;
+
     private List<QuestionInputData> responses;
 
 }
