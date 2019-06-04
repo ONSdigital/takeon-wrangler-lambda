@@ -26,6 +26,4 @@ public class WranglerLambdaHandler implements RequestHandler<WranglerRequest, St
     private ProcessWranglerQuestionData newProcessQuestionData() {
         return new ProcessWranglerQuestionData();
     }
-
-
 }

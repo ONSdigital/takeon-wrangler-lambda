@@ -63,7 +63,7 @@ public class ProcessWranglerQuestionData {
             }
         }
         // BPM (Business Process Management) response goes here. This method puts 
-        sendBpmResponse("B123-P456-M789", "QvsDQ", System.getenv("topicARN"));
+        sendBpmResponse("B123-P456-M789", "QvsDQ", PropertiesUtil.getProperty(Constants.TOPIC_ARN));
     }
 
     /**
@@ -119,6 +119,8 @@ public class ProcessWranglerQuestionData {
 
     private void sendBpmResponse(String bpmInstance, String validationName, String topicArn) throws JsonProcessingException{
         String messageToSend;
+        log.info(format("topicARN: %s", topicArn));
+        log.info(format("lambda: ", System.getenv()));
         try{
             messageToSend = constructBpmResponse(bpmInstance, validationName);
         }
