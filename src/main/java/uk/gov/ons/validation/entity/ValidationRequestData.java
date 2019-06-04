@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ValidationRequestData {
-    public String primaryValue;
-    public String comparisonValue;
-    public Object metaData;
-
+    private String primaryValue;
+    private String comparisonValue;
+    private Object metaData;
 }
