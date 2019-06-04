@@ -63,7 +63,7 @@ public class ProcessWranglerQuestionData {
             }
         }
         // BPM (Business Process Management) response goes here. This method puts 
-        sendBpmResponse("B123-P456-M789", "QvsDQ", "arn:aws:sns:eu-west-2:014669633018:Take-On-Validation-SNS");
+        sendBpmResponse("B123-P456-M789", "QvsDQ", System.getenv("topicARN"));
     }
 
     /**
@@ -114,8 +114,7 @@ public class ProcessWranglerQuestionData {
 
     private String constructBpmResponse(String bpmInstance, String validationName) throws JsonProcessingException{
         MessageResponse message = MessageResponse.builder().bpmInstance(bpmInstance).validationName(validationName).build();
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(message);
+        return new ObjectMapper().writeValueAsString(message);
     }
 
     private void sendBpmResponse(String bpmInstance, String validationName, String topicArn) throws JsonProcessingException{
