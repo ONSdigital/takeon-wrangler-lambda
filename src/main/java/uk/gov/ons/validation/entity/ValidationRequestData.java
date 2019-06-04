@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class WranglerResponse {
-    //Future UseCase i.e. response from this Lambda passed to another Lambda
-    private WranglerResponseData responses;
-
+@NoArgsConstructor
+public class ValidationRequestData {
+    private String primaryValue;
+    private String comparisonValue;
+    private Object metaData;
 }

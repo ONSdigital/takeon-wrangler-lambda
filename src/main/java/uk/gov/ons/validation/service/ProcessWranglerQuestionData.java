@@ -15,7 +15,7 @@ import uk.gov.ons.validation.entity.QuestionInputData;
 import uk.gov.ons.validation.entity.ValidationConfig;
 import lombok.extern.log4j.Log4j2;
 import uk.gov.ons.validation.entity.WranglerRequest;
-import uk.gov.ons.validation.entity.WranglerResponseData;
+import uk.gov.ons.validation.entity.ValidationRequestData;
 import uk.gov.ons.validation.util.PropertiesUtil;
 
 import java.util.List;
@@ -50,13 +50,12 @@ public class ProcessWranglerQuestionData {
             for (ValidationConfig config : configuration) {
                 InvokeConfig invokeConfig = newInvokeConfig();
                 for (QuestionInputData inputData : responses) {
-                    invokeConfig.processQuestionCodeFound(inputData, config.getQuestionCode());
-                    invokeConfig.processDerivedQuestFound(inputData, config.getDerivedQuestionCode());
-                    if (invokeConfig.isQuestionCodeFound() && invokeConfig.isDerivedQuestFound()) {
+                    invokeConfig.processQuestionCode(inputData, config.getQuestionCode());
+                    invokeConfig.processDerivedQuestCode(inputData, config.getDerivedQuestionCode());
+                    if (invokeConfig.isBothFound()) {
                         log.info(format(QUES_DER_MESSAGE, invokeConfig.getFinalQuestCode(),
                                 invokeConfig.getFinalDerivedQuestCode(), invokeConfig.getFinalQuestCodeValue(),
                                 invokeConfig.getFinalDerivedQuestValue()));
-                        //Call External Lambda which performs Validation
                         callValidationLambda(invokeConfig);
                         break;
                     }
@@ -68,16 +67,15 @@ public class ProcessWranglerQuestionData {
     }
 
     /**
-     * Call Validation Lambda i.e. VET
+     *git add Call Validation Lambda i.e. VET
      *
      * @param config InvokeConfig
      * @throws JsonProcessingException
      */
     private void callValidationLambda(InvokeConfig config) throws JsonProcessingException {
         try {
-            //Call External Lambda which performs Validation
             log.info("Before Calling Validation Lambda");
-            WranglerResponseData dataElement = WranglerResponseData.builder()
+            ValidationRequestData dataElement = ValidationRequestData.builder()
                     .primaryValue(config.getFinalQuestCodeValue())
                     .comparisonValue(config.getFinalDerivedQuestValue())
                     .build();

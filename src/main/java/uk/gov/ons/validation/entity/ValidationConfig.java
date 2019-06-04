@@ -14,8 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ValidationConfig {
-    public String questionCode;
-    public String derivedQuestionCode;
+    private String questionCode;
+    private String derivedQuestionCode;
 
     public List<ValidationConfig> getValidationConfiguration() {
         List<ValidationConfig> configuration = new ArrayList<>();
