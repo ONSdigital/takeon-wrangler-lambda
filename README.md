@@ -73,6 +73,8 @@ The following configuration is required:
 
 WRANGLER_NAME - the name of the wrangler lambda i.e VET being called within the eu-west-2 region - takeon-val-comparison-dev-valueComparison
 
+TOPIC_ARN - the arn of the topic that messages will be published to.
+
 
 #### **Deployment**
 
