@@ -30,7 +30,7 @@ public class InvokeConfig {
      * @param inputData
      * @param configQuestionCode
      */
-    public void processQuestionCodeFound(QuestionInputData inputData, String configQuestionCode) {
+    public void processQuestionCode(QuestionInputData inputData, String configQuestionCode) {
         if (inputData.getQuestionCode().equals(configQuestionCode)) {
             this.isQuestionCodeFound = true;
             this.finalQuestCode = inputData.getQuestionCode();
@@ -44,7 +44,7 @@ public class InvokeConfig {
      * @param inputData
      * @param configDerivedQuestCode
      */
-    public void processDerivedQuestFound(QuestionInputData inputData, String configDerivedQuestCode) {
+    public void processDerivedQuestCode(QuestionInputData inputData, String configDerivedQuestCode) {
         if (inputData.getQuestionCode().equals(configDerivedQuestCode)) {
             this.isDerivedQuestFound = true;
             this.finalDerivedQuestCode = inputData.getQuestionCode();
@@ -52,6 +52,15 @@ public class InvokeConfig {
             log.info(format(MATCH_FOUND_DERIVED_QUEST, finalDerivedQuestCode));
 
         }
+
+    }
+
+    /**
+     * Method to find both Question and derived question code
+     */
+    public boolean isBothFound() {
+
+        return this.isDerivedQuestFound && this.isQuestionCodeFound;
 
     }
 }
