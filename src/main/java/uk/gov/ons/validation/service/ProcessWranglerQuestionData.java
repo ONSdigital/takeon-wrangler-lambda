@@ -68,7 +68,6 @@ public class ProcessWranglerQuestionData {
      */
     private void callValidationLambda(InvokeConfig config) throws JsonProcessingException {
         try {
-            //Call External Lambda which performs Validation
             log.info("Before Calling Validation Lambda");
             WranglerResponseData dataElement = WranglerResponseData.builder()
                     .primaryValue(config.getFinalQuestCodeValue())
