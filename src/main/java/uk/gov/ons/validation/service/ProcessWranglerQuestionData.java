@@ -5,9 +5,12 @@ import com.amazonaws.services.lambda.AWSLambdaAsync;
 import com.amazonaws.services.lambda.AWSLambdaAsyncClient;
 import com.amazonaws.services.lambda.model.InvokeRequest;
 import com.amazonaws.services.lambda.model.InvokeResult;
+import com.amazonaws.services.sns.AmazonSNSClientBuilder;
+import com.amazonaws.services.sns.model.PublishRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.ons.validation.common.Constants;
+import uk.gov.ons.validation.entity.MessageResponse;
 import uk.gov.ons.validation.entity.QuestionInputData;
 import uk.gov.ons.validation.entity.ValidationConfig;
 import lombok.extern.log4j.Log4j2;
@@ -26,6 +29,7 @@ public class ProcessWranglerQuestionData {
     private static final String QUES_DER_MESSAGE = "Match Found for both Question and Derived Question. " +
             "Question Code is %s Derived Question code is %s Question Code value %s " +
             "and Derived Question code value is %s.";
+    private static final String publish_message =  "Publishing message to topic: %s";
 
     /**
      * Process Question data containing Question code and their values from Data Preparation Lambda
@@ -58,6 +62,8 @@ public class ProcessWranglerQuestionData {
                 }
             }
         }
+        // BPM (Business Process Management) response goes here. This method puts 
+        sendBpmResponse("B123-P456-M789", "QvsDQ", PropertiesUtil.getProperty(Constants.TOPIC_ARN));
     }
 
     /**
@@ -105,7 +111,31 @@ public class ProcessWranglerQuestionData {
         return new InvokeRequest();
     }
 
-    /**
+    private String constructBpmResponse(String bpmInstance, String validationName) throws JsonProcessingException{
+        MessageResponse message = MessageResponse.builder().bpmInstance(bpmInstance).validationName(validationName).build();
+        return new ObjectMapper().writeValueAsString(message);
+    }
+
+    private void sendBpmResponse(String bpmInstance, String validationName, String topicArn) throws Exception{
+        String messageToSend;
+        try{
+            messageToSend = constructBpmResponse(bpmInstance, validationName);
+        }
+        catch(JsonProcessingException e){
+            log.error("An exception occured while attempting to process Bpm Response message", e);
+            throw e;
+        }
+        try{
+            log.info(format(publish_message, topicArn));
+            PublishRequest publishRequest = new PublishRequest(topicArn, messageToSend);
+            AmazonSNSClientBuilder.defaultClient().publish(publishRequest);
+        }
+        catch(Exception  e){
+            log.error("An exception occured during a publish request", e);
+        }
+
+    }
+        /**
      * Create new Invoke Config to process Question and Derived data
      *
      * @return InvokeConfig
