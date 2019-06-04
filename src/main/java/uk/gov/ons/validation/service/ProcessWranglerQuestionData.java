@@ -12,7 +12,7 @@ import uk.gov.ons.validation.entity.QuestionInputData;
 import uk.gov.ons.validation.entity.ValidationConfig;
 import lombok.extern.log4j.Log4j2;
 import uk.gov.ons.validation.entity.WranglerRequest;
-import uk.gov.ons.validation.entity.WranglerResponseData;
+import uk.gov.ons.validation.entity.ValidationRequestData;
 import uk.gov.ons.validation.util.PropertiesUtil;
 
 import java.util.List;
@@ -69,7 +69,7 @@ public class ProcessWranglerQuestionData {
     private void callValidationLambda(InvokeConfig config) throws JsonProcessingException {
         try {
             log.info("Before Calling Validation Lambda");
-            WranglerResponseData dataElement = WranglerResponseData.builder()
+            ValidationRequestData dataElement = ValidationRequestData.builder()
                     .primaryValue(config.getFinalQuestCodeValue())
                     .comparisonValue(config.getFinalDerivedQuestValue())
                     .build();

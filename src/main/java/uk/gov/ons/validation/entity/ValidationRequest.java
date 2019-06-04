@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WranglerResponse {
+public class ValidationRequest {
     //Future UseCase i.e. response from this Lambda passed to another Lambda
-    private WranglerResponseData responses;
+    private ValidationRequestData responses;
 
 }

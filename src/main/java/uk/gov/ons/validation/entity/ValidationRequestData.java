@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WranglerResponseData {
+public class ValidationRequestData {
     public String primaryValue;
     public String comparisonValue;
     public Object metaData;
