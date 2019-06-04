@@ -127,7 +127,6 @@ public class ProcessWranglerQuestionData {
             log.error("An exception occured while attempting to process Bpm Response message", e);
             throw e;
         }
-
         try{
             log.info(format(publish_message, topicArn));
             PublishRequest publishRequest = new PublishRequest(topicArn, messageToSend);
