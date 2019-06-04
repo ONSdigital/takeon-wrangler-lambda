@@ -29,6 +29,7 @@ public class ProcessWranglerQuestionData {
     private static final String QUES_DER_MESSAGE = "Match Found for both Question and Derived Question. " +
             "Question Code is %s Derived Question code is %s Question Code value %s " +
             "and Derived Question code value is %s.";
+    private static final String publish_message =  "Publishing message to topic: %s";
 
     /**
      * Process Question data containing Question code and their values from Data Preparation Lambda
@@ -117,10 +118,8 @@ public class ProcessWranglerQuestionData {
         return new ObjectMapper().writeValueAsString(message);
     }
 
-    private void sendBpmResponse(String bpmInstance, String validationName, String topicArn) throws JsonProcessingException{
+    private void sendBpmResponse(String bpmInstance, String validationName, String topicArn) throws Exception{
         String messageToSend;
-        log.info(format("topicARN: %s", topicArn));
-        log.info(format("lambda: ", System.getenv()));
         try{
             messageToSend = constructBpmResponse(bpmInstance, validationName);
         }
@@ -130,6 +129,7 @@ public class ProcessWranglerQuestionData {
         }
 
         try{
+            log.info(format(publish_message, topicArn));
             PublishRequest publishRequest = new PublishRequest(topicArn, messageToSend);
             AmazonSNSClientBuilder.defaultClient().publish(publishRequest);
         }
