@@ -63,7 +63,51 @@ The Prepared Json would be similar to
         "metaData":null
     }
 
- Call the Validation Lambda for a each item in Validation Config
+ Call the Validation Lambda for a each item in Validation Config and stored each ValidationResult in a list
+
+ The Output from Value comparison VET would be similar to
+
+ {
+   "valueFormula": "150 != 603",
+   "triggered": true
+ }
+
+ Amend the Question Code to each ValidationResult similar to
+
+ [{"questionCode":"601","valueFormula":"146 != 148","triggered":"true"},{"questionCode":"602","valueFormula":"150 != 603","triggered":"true"}]
+
+ Add Survey, period, reference and instance parameters to the result list and build the JSON in the following format
+
+ {
+   "type": "POST",
+   "input": {
+     "period": "4990012",
+     "reference": "201211",
+     "survey": "066",
+     "instance": "instanceid",
+     "validationName": "QvDQ",
+     "validationResults": [
+       {
+         "questionCode": "601",
+         "valueFormula": "146 != 148",
+         "triggered": "true"
+       },
+       {
+         "questionCode": "602",
+         "valueFormula": "150 != 603",
+         "triggered": "true"
+       }
+     ]
+   }
+ }
+
+ Make a call to Response Persistence Lambda
+
+ Lambda Name: response-persistence-lambda
+
+ Verify the following output
+
+ {"response":"Persisted Successfully"}
 
 
 ### **Configuration**
@@ -72,8 +116,8 @@ The following configuration is required:
 
 
 WRANGLER_NAME - the name of the wrangler lambda i.e VET being called within the eu-west-2 region - takeon-val-comparison-dev-valueComparison
-
-TOPIC_ARN - the arn of the topic that messages will be published to.
+WRANGLER_NAME_RESPONSE_PERSISTENCE - the name of the Response persistence Lambda - response-persistence-lambda
+TOPIC_ARN - BPM stuff - - the arn of the topic that messages will be published to -  arn:aws:sns:eu-west-2:014669633018:Take-On-Validation-SNS
 
 
 #### **Deployment**
