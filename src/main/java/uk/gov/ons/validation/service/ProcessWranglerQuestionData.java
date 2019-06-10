@@ -81,7 +81,7 @@ public class ProcessWranglerQuestionData {
         additionalRequest.setValidationName(VALIDATION_NAME);
         HandlerAdditionalRequest finalRequest = new HandleAdditionalClassConverter().convertToAdditionalWranglerRequest(additionalRequest);
         callPersistenceLambda(finalRequest);
-        // BPM (Business Process Management) response goes here. This method puts 
+        // BPM (Business Process Management) response goes here. This method puts
         sendBpmResponse("B123-P456-M789", "QvsDQ", PropertiesUtil.getProperty(Constants.TOPIC_ARN));
     }
 
@@ -155,6 +155,7 @@ public class ProcessWranglerQuestionData {
             InvokeResult result = buildAWSLambdaClient().invoke(invokeRequest);
             log.info(format("Status after calling Response Persistence Lambda %s", result.getStatusCode()));
             String rawJson = retrieveRawJson(result);
+            log.info(format("Raw Json after calling Response Persistence Lambda %s", rawJson));
         } catch (JsonProcessingException e) {
             log.error("An exception occurred while attempting to process JSON " +
                     "and send the request to Validation lambda.", e);
@@ -194,7 +195,7 @@ public class ProcessWranglerQuestionData {
         try {
             messageToSend = constructBpmResponse(bpmInstance, validationName);
         } catch (JsonProcessingException e) {
-            log.error("An exception occured while attempting to process Bpm Response message", e);
+            log.error("An exception occurred while attempting to process Bpm Response message", e);
             throw e;
         }
         try {
