@@ -116,7 +116,9 @@ The following configuration is required:
 
 
 WRANGLER_NAME - the name of the wrangler lambda i.e VET being called within the eu-west-2 region - takeon-val-comparison-dev-valueComparison
+
 WRANGLER_NAME_RESPONSE_PERSISTENCE - the name of the Response persistence Lambda - response-persistence-lambda
+
 TOPIC_ARN - BPM stuff - - the arn of the topic that messages will be published to -  arn:aws:sns:eu-west-2:014669633018:Take-On-Validation-SNS
 
 
