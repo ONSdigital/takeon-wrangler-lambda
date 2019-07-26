@@ -49,8 +49,8 @@ A Lambda function to handle incoming requests containing Question Code and value
 
     Hard coded  Validation Config which has list of QuestionCode and Derived Question Code combinations for example
 
-                Question Code 601 != Derived Question Code 700
-                Question Code 602 != Derived Question Code 701
+                Question Code 601 Derived Question Code 700
+                Question Code 602 Derived Question Code 701
 
 
 Looping through the Validation Config and prepare Json for calling Validation Lambda i.e VET
@@ -58,17 +58,17 @@ Looping through the Validation Config and prepare Json for calling Validation La
 The Prepared Json would be similar to
 
     {
-        "primaryValue":"150",
-        "comparisonValue":"603",
+        "primaryValue":"146",
+        "comparisonValue":"148",
         "metaData":null
     }
 
- Call the Validation Lambda for a each item in Validation Config and stored each ValidationResult in a list
+ Call the Validation Lambda for a each item in Validation Config and store each ValidationResult in a list
 
  The Output from Value comparison VET would be similar to
 
  {
-   "valueFormula": "150 != 603",
+   "valueFormula": "146 != 148",
    "triggered": true
  }
 
@@ -110,7 +110,8 @@ The Prepared Json would be similar to
  {"response":"Persisted Successfully"}
 
 
-### **Configuration**
+
+
 
 The following configuration is required:
 
