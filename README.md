@@ -81,8 +81,8 @@ The Prepared Json would be similar to
  {
    "type": "POST",
    "input": {
-     "period": "4990012",
-     "reference": "201211",
+     "period": "201211",
+     "reference": "4990012",
      "survey": "066",
      "instance": "instanceid",
      "validationName": "QvDQ",

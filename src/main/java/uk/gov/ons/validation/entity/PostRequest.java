@@ -13,9 +13,9 @@ public class PostRequest extends KeyMetaData {
     private List<ValidationResult> validationResults;
 
     @Builder
-    public PostRequest(String reference, String period, String survey, String instance, String validationName,
+    public PostRequest(String period, String reference,  String survey, String instance, String validationName,
                        List<ValidationResult> validationResults) {
-        super(reference, period, survey, instance, validationName);
+        super(period, reference,  survey, instance, validationName);
         this.validationResults = validationResults;
     }
 
