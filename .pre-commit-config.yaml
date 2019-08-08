@@ -1,0 +1,25 @@
+repos:
+- repo: https://github.com/ambv/black
+  rev: stable
+  hooks:
+  - id: black
+    language_version: python3.7
+-  repo: https://github.com/pre-commit/pre-commit-hooks
+   rev: v2.2.3
+   hooks:
+   - id: debug-statements
+   - id: check-merge-conflict
+   - id: flake8     
+- repo: https://github.com/bitmonkey/git-diff-check
+  rev: 37d034abb7a5c0b4fd43b1a123efe8f2c00c5f8a
+  hooks:
+    - id: git-diff-check
+- repo: local  
+  hooks:
+    - id: tests
+      name: run tests
+      entry: pytest -v
+      language: system
+      types: [python]
+  
+
